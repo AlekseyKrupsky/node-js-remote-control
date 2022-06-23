@@ -6,7 +6,7 @@ const wss = new WebSocketServer({ port: 8080 });
 wss.on('connection', (ws: any) => {
     console.log('connection');
 
-    ws.on('message', (data: string) => {
+    ws.on('message', async (data: string) => {
         const command = data.toString();
 
         console.log('Received: %s', command);
@@ -22,23 +22,15 @@ wss.on('connection', (ws: any) => {
                 return parseInt(value);
             });
 
-            const result = commands[handler](...intParams);
+            let result = await commands[handler](...intParams);
 
             let response = command;
 
-            if (typeof result.then === "function") {
-                result.then((res: string) => {
-                    response += ` ${res}`;
-
-                    ws.send(response);
-                });
-            } else {
-                if (result !== undefined) {
-                    response += ` ${result}`;
-                }
-
-                ws.send(response);
+            if (result !== undefined) {
+                response += ` ${result}`;
             }
+
+            ws.send(response);
         }
     });
 });

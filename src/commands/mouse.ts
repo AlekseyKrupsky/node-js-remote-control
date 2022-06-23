@@ -18,7 +18,7 @@ const moveMouseUp = (yShift: number): void => {
     robot.moveMouseSmooth(mousePos.x, newYPos);
 };
 
-const moveMouseDown = (yShift: number): void  => {
+const moveMouseDown = (yShift: number): void => {
     const mousePos = robot.getMousePos();
 
     let newYPos = mousePos.y + yShift;
@@ -30,7 +30,7 @@ const moveMouseDown = (yShift: number): void  => {
     robot.moveMouseSmooth(mousePos.x, newYPos);
 };
 
-const moveMouseLeft = (xShift: number): void  => {
+const moveMouseLeft = (xShift: number): void => {
     const mousePos = robot.getMousePos();
 
     let newXPos = mousePos.x - xShift;
@@ -42,7 +42,7 @@ const moveMouseLeft = (xShift: number): void  => {
     robot.moveMouseSmooth(newXPos, mousePos.y);
 };
 
-const moveMouseRight = (xShift: number): void  => {
+const moveMouseRight = (xShift: number): void => {
     const mousePos = robot.getMousePos();
 
     let newXPos = mousePos.x + xShift;
