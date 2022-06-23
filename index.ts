@@ -26,11 +26,19 @@ wss.on('connection', (ws: any) => {
 
             let response = command;
 
-            if (result !== undefined) {
-                response += ` ${result}`;
-            }
+            if (typeof result.then === "function") {
+                result.then((res: string) => {
+                    response += ` ${res}`;
 
-            ws.send(response);
+                    ws.send(response);
+                });
+            } else {
+                if (result !== undefined) {
+                    response += ` ${result}`;
+                }
+
+                ws.send(response);
+            }
         }
     });
 });

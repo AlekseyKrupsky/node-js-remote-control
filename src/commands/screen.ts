@@ -1,55 +1,70 @@
 import * as robot from 'robotjs';
 import * as Jimp from 'jimp';
 
-const screenShotSize: number = 1;
+const screenShotSize: number = 200;
+const alphaByteValue = 0xff;
 
-export const getPrintScreen = (): string => {
+const getCaptureCoordinates = (): {
+    x: number,
+    y: number
+} => {
     const mousePos = robot.getMousePos();
 
-    const img = robot.screen.capture(mousePos.x, mousePos.y, screenShotSize, screenShotSize);
+    const halfScreenShotSize = screenShotSize / 2;
 
-    // img.image.setMim
-    //
-    // new Jimp({ data: img.image, width: 1, height: 1 }, (err: any, image: any) => {
-    //     console.log(image);
-    // });
+    let xPosition: number = mousePos.x - halfScreenShotSize;
+    let yPosition: number = mousePos.y - halfScreenShotSize;
 
-    // jimp.read(img.image).then((image) => {
-    //     console.log(image);
-    // });
+    if (xPosition < 0) {
+        xPosition = 0;
+    } else if (xPosition + screenShotSize > robot.getScreenSize().width) {
+        xPosition = robot.getScreenSize().width - screenShotSize;
+    }
 
-        // img.colorAt(1,1);
+    if (yPosition < 0) {
+        yPosition = 0;
+    } else if (yPosition + screenShotSize > robot.getScreenSize().height) {
+        yPosition = robot.getScreenSize().height - screenShotSize;
+    }
 
-    // console.log(img.bitsPerPixel = 8);
+    return { x: xPosition, y: yPosition };
+};
 
-// btoa()
-//     console.log(img.image.toString('base64'));
-//
-//     const pngSignature = Buffer.from([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]);
-//     const ihdrSignature = Buffer.from([0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52]);
-//     // const ihdrData = Buffer.from([0x00, 0x00, 0x00, 0x80, 0x00, 0x00, 0x00, 0x7F, 0x08, 0x03, 0x00, 0x00, 0x00]); // 128x127x8 sum
-//     const ihdrData = Buffer.from([0x00, 0x00, 0x00, 0xC8, 0x00, 0x00, 0x00, 0xC8, 0x20, 0x03, 0x00, 0x00, 0x00]); // 200x200x32
-//     // const crc32Hash = Buffer.from([0x10, 0x24, 0x3A, 0x35]); // 128x127x8 sum
-//     const crc32Hash = Buffer.from([0xec, 0x40, 0xef, 0xfa]); // 200x200x32 sum
-//
-//
-//
-//     const imEnd = Buffer.from([0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82]);
-//
-//
-//     // console.log(img.image);
-//     // console.log(img.image.toString());
-//     // console.log(img.image.toString('base64'));
-//
-//     const iii = Buffer.concat([pngSignature, ihdrSignature, ihdrData, crc32Hash, img.image, imEnd]);
-//
-//     console.log(iii);
+const updateImageBufferBytes = (image: Buffer): void => {
+    const imageSize = image.length;
 
+    for (let i = 0; i <= imageSize; i++) {
+        if ((i + 1) % 4 === 0) {
+            const redByte = image[i - 3];
 
-    // const bb = new Buffer(img.image).toString('base64');
+            image[i - 3] = image[i - 1];
+            image[i - 1] = redByte;
 
-    // console.log(bb);
+            image[i] = alphaByteValue;
+        }
+    }
+};
 
-    return 'sdf';
-    // return `prnt_scrn ${iii.toString('base64')}`;
+export const getPrintScreen = (): Promise<string> => {
+    const captureCoordinates = getCaptureCoordinates();
+
+    const img = robot.screen.capture(captureCoordinates.x, captureCoordinates.y, screenShotSize, screenShotSize);
+
+    updateImageBufferBytes(img.image);
+
+    return new Promise((resolve, reject) => {
+        const testImg = Jimp.create(screenShotSize, screenShotSize);
+
+        testImg.then((image) => {
+            image.bitmap.data = img.image;
+
+            image.getBase64('image/png', (err, encodedImage) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(encodedImage.replace('data:image/png;base64,', ''))
+                }
+            });
+        });
+    });
 }
