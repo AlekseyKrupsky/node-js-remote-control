@@ -1,9 +1,13 @@
 import * as robot from 'robotjs';
 import { MousePos } from "./mouse";
 
+const MOUSE_TOGGLE_UP = 'up';
+const MOUSE_TOGGLE_DOWN = 'down';
+const DRAW_DELAY = 2000;
+
 const drawSquare = (width: number): void => {
     setTimeout(() => {
-        robot.mouseToggle('down');
+        robot.mouseToggle(MOUSE_TOGGLE_DOWN);
 
         let mousePos: MousePos = robot.getMousePos();
         robot.moveMouseSmooth(mousePos.x + width, mousePos.y);
@@ -17,13 +21,13 @@ const drawSquare = (width: number): void => {
         mousePos = robot.getMousePos();
         robot.moveMouseSmooth(mousePos.x, mousePos.y - width);
 
-        robot.mouseToggle('up');
-    }, 2000);
+        robot.mouseToggle(MOUSE_TOGGLE_UP);
+    }, DRAW_DELAY);
 };
 
 const drawRectangle = (width: number, height: number): void => {
     setTimeout(() => {
-        robot.mouseToggle('down');
+        robot.mouseToggle(MOUSE_TOGGLE_DOWN);
 
         let mousePos: MousePos = robot.getMousePos();
         robot.moveMouseSmooth(mousePos.x + width, mousePos.y);
@@ -37,15 +41,15 @@ const drawRectangle = (width: number, height: number): void => {
         mousePos = robot.getMousePos();
         robot.moveMouseSmooth(mousePos.x, mousePos.y - height);
 
-        robot.mouseToggle('up');
-    }, 2000);
+        robot.mouseToggle(MOUSE_TOGGLE_UP);
+    }, DRAW_DELAY);
 };
 
 const drawCircle = (radius: number): void => {
     setTimeout(() => {
         const initMousePos: MousePos = robot.getMousePos();
 
-        robot.mouseToggle('down');
+        robot.mouseToggle(MOUSE_TOGGLE_DOWN);
 
         for (let i: number = -radius; i <= radius; i++) {
             const y = Math.sqrt(radius * radius - i * i);
@@ -61,8 +65,8 @@ const drawCircle = (radius: number): void => {
             robot.dragMouse(initMousePos.x + shiftedX, initMousePos.y + y);
         }
 
-        robot.mouseToggle('up');
-    }, 2000);
+        robot.mouseToggle(MOUSE_TOGGLE_UP);
+    }, DRAW_DELAY);
 };
 
 export { drawSquare, drawRectangle, drawCircle };
