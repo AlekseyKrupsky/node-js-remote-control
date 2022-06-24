@@ -1,10 +1,11 @@
 import * as robot from 'robotjs';
+import { MousePos } from "./mouse";
 
 const drawSquare = (width: number): void => {
     setTimeout(() => {
         robot.mouseToggle('down');
 
-        let mousePos = robot.getMousePos();
+        let mousePos: MousePos = robot.getMousePos();
         robot.moveMouseSmooth(mousePos.x + width, mousePos.y);
 
         mousePos = robot.getMousePos();
@@ -24,7 +25,7 @@ const drawRectangle = (width: number, height: number): void => {
     setTimeout(() => {
         robot.mouseToggle('down');
 
-        let mousePos = robot.getMousePos();
+        let mousePos: MousePos = robot.getMousePos();
         robot.moveMouseSmooth(mousePos.x + width, mousePos.y);
 
         mousePos = robot.getMousePos();
@@ -42,18 +43,18 @@ const drawRectangle = (width: number, height: number): void => {
 
 const drawCircle = (radius: number): void => {
     setTimeout(() => {
-        const initMousePos = robot.getMousePos();
+        const initMousePos: MousePos = robot.getMousePos();
 
         robot.mouseToggle('down');
 
-        for (let i = -radius; i <= radius; i++) {
+        for (let i: number = -radius; i <= radius; i++) {
             const y = Math.sqrt(radius * radius - i * i);
             const shiftedX = i + radius;
 
             robot.dragMouse(initMousePos.x + shiftedX, initMousePos.y - y);
         }
 
-        for (let i = radius; i >= -radius; i--) {
+        for (let i: number = radius; i >= -radius; i--) {
             const y = Math.sqrt(radius * radius - i * i);
             const shiftedX = i + radius;
 

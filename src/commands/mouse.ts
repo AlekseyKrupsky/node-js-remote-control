@@ -1,15 +1,17 @@
 import * as robot from 'robotjs';
 
+export type MousePos = { x: number, y: number };
+
 const getMousePosition = (): string => {
-    const mousePos = robot.getMousePos();
+    const mousePos: MousePos = robot.getMousePos();
 
     return `{${mousePos.x}},{${mousePos.y}}`;
 };
 
 const moveMouseUp = (yShift: number): void => {
-    const mousePos = robot.getMousePos();
+    const mousePos: MousePos = robot.getMousePos();
 
-    let newYPos = mousePos.y - yShift;
+    let newYPos: number = mousePos.y - yShift;
 
     if (newYPos < 0) {
         newYPos = 0;
@@ -19,9 +21,9 @@ const moveMouseUp = (yShift: number): void => {
 };
 
 const moveMouseDown = (yShift: number): void => {
-    const mousePos = robot.getMousePos();
+    const mousePos: MousePos = robot.getMousePos();
 
-    let newYPos = mousePos.y + yShift;
+    let newYPos: number = mousePos.y + yShift;
 
     if (newYPos > robot.getScreenSize().height) {
         newYPos = robot.getScreenSize().height;
@@ -31,9 +33,9 @@ const moveMouseDown = (yShift: number): void => {
 };
 
 const moveMouseLeft = (xShift: number): void => {
-    const mousePos = robot.getMousePos();
+    const mousePos: MousePos = robot.getMousePos();
 
-    let newXPos = mousePos.x - xShift;
+    let newXPos: number = mousePos.x - xShift;
 
     if (newXPos < 0) {
         newXPos = 0;
@@ -43,9 +45,9 @@ const moveMouseLeft = (xShift: number): void => {
 };
 
 const moveMouseRight = (xShift: number): void => {
-    const mousePos = robot.getMousePos();
+    const mousePos: MousePos = robot.getMousePos();
 
-    let newXPos = mousePos.x + xShift;
+    let newXPos: number = mousePos.x + xShift;
 
     if (newXPos > robot.getScreenSize().width) {
         newXPos = robot.getScreenSize().width;
