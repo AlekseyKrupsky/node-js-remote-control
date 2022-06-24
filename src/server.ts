@@ -4,7 +4,7 @@ import { commands } from "./commands/commands";
 
 const DEFAULT_PORT: number = 8080;
 
-const parseCommand = (command): {
+const parseCommand = (command: string): {
     handler: Function,
     params: number[]
 } => {
@@ -14,11 +14,11 @@ const parseCommand = (command): {
         throw new Error(log.INVALID_MESSAGE);
     }
 
+    const handler = commandParts.shift();
+
     const intParams: number[] = commandParts.map((value) => {
         return parseInt(value);
     });
-
-    const handler = commandParts.shift();
 
     if (handler === undefined || typeof commands[handler] !== "function") {
         throw new Error(log.UNKNOWN_COMMAND);
