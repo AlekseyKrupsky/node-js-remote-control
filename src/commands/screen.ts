@@ -1,5 +1,5 @@
 import * as robot from 'robotjs';
-import * as Jimp from 'jimp';
+import Jimp from 'jimp';
 import { MousePos } from "./mouse";
 import { Bitmap } from "robotjs";
 
