@@ -2,8 +2,6 @@ import { createWebSocketStream, WebSocket } from "ws";
 import { ConsoleMessage as log } from "./enums/console_messages";
 import { commands } from "./commands/commands";
 
-const DEFAULT_PORT: number = 8080;
-
 const parseCommand = (command: string): {
     handler: Function,
     params: number[]
@@ -30,9 +28,7 @@ const parseCommand = (command: string): {
     };
 };
 
-export const run = () => {
-    const port: number = +(process.env.PORT || DEFAULT_PORT);
-
+export const listenSocket = (port: number) => {
     const wss = new WebSocket.Server({ port: port });
 
     console.log(log.SERVER_RUNNING, port, port);
