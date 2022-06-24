@@ -1,49 +1,69 @@
-import { WebSocketServer } from 'ws';
+import { WebSocket, createWebSocketStream  } from 'ws';
 import { commands } from "./src/commands/commands";
 import * as dotenv from 'dotenv';
 import { cwd } from "node:process";
+import { ConsoleMessage as log } from "./src/console_messages";
 
 dotenv.config({ path: `${cwd()}/.env`});
 
 const port: number = +(process.env.PORT || 8080);
 
-const wss = new WebSocketServer({ port: port });
+const wss = new WebSocket.Server({ port: port });
 
-console.log(`Websocket server is running on ${port} port. Use this URL to connect: ws://localhost:${port}`);
+console.log(log.SERVER_RUNNING, port, port);
 
-wss.on('connection', (ws: any) => {
-    console.log('connection');
+wss.on('connection', (ws: WebSocket) => {
+    console.log(log.CONNECTION_ESTABLISHED);
 
-    ws.on('message', async (data: string) => {
-        const command: string = data.toString();
+    const duplex = createWebSocketStream(ws, { encoding: 'utf-8', decodeStrings: false });
 
-        console.log('Received: %s', command);
+    ws.on('close', () => {
+        wss.clients.delete(ws);
+        duplex.end();
+        console.log(log.CONNECTION_CLOSED);
+    });
+
+    duplex.on('data', async (command: string) => {
+        console.log(log.INCOMING, command);
 
         const commandParts: string[] = command.split(' ');
 
         if (commandParts.length === 0) {
+            console.log(log.INVALID_MESSAGE);
+
             return;
         }
 
         const handler: string | undefined = commandParts.shift();
-        console.log(handler);
 
         if (handler !== undefined && typeof commands[handler] === "function") {
-            console.log(commandParts);
+            try {
+                const intParams: number[] = commandParts.map((value) => {
+                    return parseInt(value);
+                });
 
-            const intParams: number[] = commandParts.map((value) => {
-                return parseInt(value);
-            });
+                let result: string = await commands[handler](...intParams);
 
-            let result: string = await commands[handler](...intParams);
+                let response: string = command;
 
-            let response: string = command;
+                if (result !== undefined) {
+                    response += ` ${result}`;
+                }
 
-            if (result !== undefined) {
-                response += ` ${result}`;
+                response += '\0';
+
+                console.log(log.RESPONSE, response);
+
+                duplex.write(response);
+            } catch (error) {
+                if (error instanceof Error) {
+                    console.log(log.ERROR, error.message);
+                } else {
+                    console.log(log.UNKNOWN_ERROR);
+                }
             }
-
-            ws.send(response);
+        } else {
+            console.log(log.UNKNOWN_COMMAND);
         }
     });
 });
