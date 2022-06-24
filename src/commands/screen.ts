@@ -69,6 +69,8 @@ export const getPrintScreen = (): Promise<string> => {
                     resolve(encodedImage.replace(BASE64_PNG_SIGNATURE, ''));
                 }
             });
+        }).catch((error) => {
+            reject(error);
         });
     });
 }
